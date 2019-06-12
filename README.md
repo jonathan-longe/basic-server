@@ -22,17 +22,17 @@ The script configures / installs the following on the remote server:
 
 ## Usage
 
-1) Login to your Digital Ocean account and create a new virtual server ("droplet").  The new virtual server must have a public ssh key installed -- the same key that resides at `~/.ssh/id
+1) Login to your Digital Ocean account and create a new virtual server ("droplet").  The remote server must have your public ssh key installed -- for example `~/.ssh/id_rsa.pub
 
 2) Then on your local machine:
 
 ```bash
-./configure_droplet.bash <IP_ADDRESS_OF_REMOTE_SERVER>
+./configure_droplet.sh <IP_ADDRESS_OF_REMOTE_SERVER>
 ```
 
 3) After the script has finished, ssh from your local machine:
 ```bash
-ssh <YOUR_USERNAME>@<IP_ADDRESS_OF_REMOTE_SERVER>
+ssh <IP_ADDRESS_OF_REMOTE_SERVER>
 ```
 
 ## Credits
