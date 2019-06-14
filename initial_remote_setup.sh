@@ -2,6 +2,7 @@
 export NEW_USER=$1
 export NEW_USER_HOMEDIR=/home/$1
 export NEW_PASSWORD=$2
+export SSH_PORT=$3
 
 echo adding a favorite alias
 alias ll='ls -lahG'
@@ -92,7 +93,7 @@ ufw default deny incoming
 ufw default allow outgoing
 
 # open ssh port
-ufw allow ssh
+ufw allow $SSH_PORT/tcp
 
 # open http port
 ufw allow 80/tcp
@@ -110,8 +111,17 @@ ufw status
 echo Make backup of the ssh daemon config file
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.BAK
 
-#echo Replace default sshd_config with secure file uploaded previously
-mv /etc/ssh/sshd_config.secure /etc/ssh/sshd_config
+echo '*************** Secure sshd_config ******************'
+
+sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
+sed -i "s/#Port 22/Port $SSH_PORT/g" /etc/ssh/sshd_config
+sed -i 's/ClientAliveInterval 120/ClientAliveInterval 600/g' /etc/ssh/sshd_config
+
+sed -i '$ a ClientAliveCountMax 3' /etc/ssh/sshd_config
+sed -i '$ a AllowGroups ssh-access' /etc/ssh/sshd_config
+
+diff --color=always /etc/ssh/sshd_config.BAK /etc/ssh/sshd_config
+
 
 # Restart the ssh service:
 echo Restart the ssh daemond

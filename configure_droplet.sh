@@ -20,15 +20,21 @@ fi
 
 echo Create remote sudo user: $USER
 
+echo ''
+
 echo What should be the password for $USER on $1
 read NEW_PASSWORD
+
+echo ''
+
+read -e -p "SSH Port? " -i "22" SSH_PORT
+echo $SSH_PORT
+
+echo ''
 
 echo '***************** Delete Known Host Key - if one exists ********************'
 ssh-keygen -f $HOME/.ssh/known_hosts -R "$1"
 
-echo Copy hardened sshd_config from local to remote
-scp ./sshd_config root@$1:/etc/ssh/sshd_config.secure
-
 echo Creating $USER on $1 using this password: $NEW_PASSWORD
-ssh root@$1 "bash -s" -- < ./initial_remote_setup.sh "$USER" "$NEW_PASSWORD"
+ssh root@$1 "bash -s" -- < ./initial_remote_setup.sh "$USER" "$NEW_PASSWORD" "$SSH_PORT"
 
