@@ -3,6 +3,8 @@ export NEW_USER=$1
 export NEW_USER_HOMEDIR=/home/$1
 export NEW_PASSWORD=$2
 export SSH_PORT=$3
+export NEW_SHELL=$4
+
 
 echo adding a favorite alias
 alias ll='ls -lahG'
@@ -55,7 +57,7 @@ addgroup ssh-access
 
 echo Create user: $NEW_USER using password: $NEW_PASSWORD
 # Create the user; add to group; create home directory (-m); set password hashed
-useradd -G users,sudo,ssh-access -m -s /bin/zsh -p $(echo $NEW_PASSWORD | openssl passwd -1 -stdin) $NEW_USER
+useradd -G users,sudo,ssh-access -m -s /bin/$NEW_SHELL -p $(echo $NEW_PASSWORD | openssl passwd -1 -stdin) $NEW_USER
 
 echo Show information about the user:
 getent passwd $NEW_USER
@@ -67,26 +69,6 @@ cp -R /root/.ssh/ $NEW_USER_HOMEDIR
 chmod 700 $NEW_USER_HOMEDIR/.ssh
 chmod 600 $NEW_USER_HOMEDIR/.ssh/*
 chown -R $NEW_USER:$NEW_USER $NEW_USER_HOMEDIR/.ssh
-
-echo *************** Switching user to new user ********************
-su -l $NEW_USER
-
-echo
-echo     ----------- Install Oh-my-zsh -------------
-wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | /bin/zsh
-
-echo
-echo     ----------- Add the bullet-train theme -----------
-cd ~/.oh-my-zsh/themes
-wget https://raw.github.com/caiogondim/bullet-train-oh-my-zsh-theme/master/bullet-train.zsh-theme
-
-echo
-echo     ----------- Make bullet-train the default theme -----------
-sed -i 's/"robbyrussell"/"bullet-train"/g' ~/.zshrc
-
-
-exit
-echo ***************** Switching back to root user *********************
 
 echo Configure the Uncomplicated Firewall
 ufw default deny incoming
@@ -126,5 +108,7 @@ diff --color=always /etc/ssh/sshd_config.BAK /etc/ssh/sshd_config
 # Restart the ssh service:
 echo Restart the ssh daemond
 service ssh restart
+
+exit
 
 

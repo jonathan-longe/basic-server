@@ -22,7 +22,7 @@ echo Create remote sudo user: $USER
 
 echo ''
 
-echo What should be the password for $USER on $1
+echo What will be the password for $USER on $1
 read NEW_PASSWORD
 
 echo ''
@@ -32,9 +32,35 @@ echo $SSH_PORT
 
 echo ''
 
+echo 'What shell do you want to install? Enter the number that corresponds to your choice below'
+options=("bash" "zsh")
+select remote_shell in "${options[@]}"
+do
+    case $remote_shell in
+        "bash")
+            break
+            ;;
+        "zsh")
+            break
+            ;;
+    esac
+done
+
+echo ''
+
 echo '***************** Delete Known Host Key - if one exists ********************'
 ssh-keygen -f $HOME/.ssh/known_hosts -R "$1"
 
+echo ''
+echo ''
+
 echo Creating $USER on $1 using this password: $NEW_PASSWORD
-ssh root@$1 "bash -s" -- < ./initial_remote_setup.sh "$USER" "$NEW_PASSWORD" "$SSH_PORT"
+ssh root@$1 "bash -s" -- < ./remote.sh "$USER" "$NEW_PASSWORD" "$SSH_PORT" "$remote_shell"
+
+if [[ $remote_shell == 'zsh' ]]; then
+
+   ssh -p$SSH_PORT $USER@$1 "zsh -s" -- < ./oh-my-zsh-install.sh
+
+ fi
+
 
