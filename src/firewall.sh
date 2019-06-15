@@ -1,4 +1,6 @@
-export SSH_PORT=$1
+#!/usr/bin/env bash
+
+export SSH_PORT=$4
 
 apt-get install -y ufw
 

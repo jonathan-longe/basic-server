@@ -1,4 +1,6 @@
-export SSH_PORT=$1
+#!/usr/bin/env bash
+
+export SSH_PORT=$4
 
 echo Make backup of the ssh daemon config file
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.BAK

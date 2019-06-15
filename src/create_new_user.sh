@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 export NEW_USER=$1
 export NEW_USER_HOMEDIR=/home/$1

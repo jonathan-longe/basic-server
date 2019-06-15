@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo adding a favorite alias
 alias ll='ls -lahG'
 

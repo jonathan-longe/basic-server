@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo '************* Installing Docker *****************'
 
 apt-get install -y apt-transport-https ca-certificates gnupg2 software-properties-common

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 export OH_MY_ZSH_URL='https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh'
 export BULLET_TRAIN_URL='https://raw.github.com/caiogondim/bullet-train-oh-my-zsh-theme/master/bullet-train.zsh-theme'
 

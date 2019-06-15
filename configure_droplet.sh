@@ -57,33 +57,33 @@ echo ''
 echo ''
 
 echo Install basic components on $SERVER_IP
-ssh root@$SERVER_IP "bash -s" -- < ./src/basic_setup.sh
+ssh root@$SERVER_IP "bash -s" -- < ./src/basic_setup.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
 
 echo ''
 echo ''
 
 echo Creating $USER on $SERVER_IP using this password: $NEW_PASSWORD
-ssh root@$SERVER_IP "bash -s" -- < ./src/create_new_user.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL"
+ssh root@$SERVER_IP "bash -s" -- < ./src/create_new_user.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
 
 echo ''
 echo ''
 
-#echo Installing Docker and Docker Compose
-#ssh root@$SERVER_IP "bash -s" -- < ./src/docker.sh
+echo Installing Docker and Docker Compose
+ssh root@$SERVER_IP "bash -s" -- < ./src/docker.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
 
-#echo ''
-#echo ''
+echo ''
+echo ''
 
 
 echo Configure the Uncomplicated Firewall
-ssh root@$SERVER_IP "bash -s" -- < ./src/firewall.sh "$SSH_PORT"
+ssh root@$SERVER_IP "bash -s" -- < ./src/firewall.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
 
 echo ''
 echo ''
 
 echo Make the SSH Daemon more secure
 # After this script runs, root can no longer ssh
-ssh root@$SERVER_IP "bash -s" -- < ./src/ssh_daemon.sh "$SSH_PORT"
+ssh root@$SERVER_IP "bash -s" -- < ./src/ssh_daemon.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
 
 echo ''
 echo ''
@@ -91,7 +91,7 @@ echo ''
 
 if [[ $REMOTE_SHELL == 'zsh' ]]; then
 
-   ssh -p$SSH_PORT $USER@$SERVER_IP "bash -s" -- < ./src/oh-my-zsh-install.sh
+   ssh -p$SSH_PORT $USER@$SERVER_IP "bash -s" -- < ./src/oh-my-zsh-install.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
 
 fi
 
