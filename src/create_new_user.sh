@@ -1,32 +1,56 @@
 #!/usr/bin/env bash
 
-export NEW_USER=$1
-export NEW_USER_HOMEDIR=/home/$1
-export NEW_PASSWORD=$2
-export NEW_SHELL=$3
+
+: "${new_user:=$1}"
+: "${new_password:=$2}"
+: "${new_shell:=$3}"
+
+if [[ -z "${new_user}" ]]; then
+
+    echo ******** Required parameter new_user not set ********
+    exit
+
+fi
+
+if [[ -z "${new_password}" ]]; then
+
+    echo ******** Required parameter new_password not set ********
+    exit
+
+fi
+
+if [[ -z "${new_shell}" ]]; then
+
+    echo ******** Required parameter new_shell not set ********
+    exit
+
+fi
+
+
+new_user_homedir=/home/"${new_user}"
 
 addgroup ssh-access
 
-if [[ $NEW_SHELL == 'zsh' ]]; then
+if [[ "${new_shell}" == 'zsh' ]]; then
 
    apt-get install -y zsh
 
 fi
 
-echo Create user: $NEW_USER using password: $NEW_PASSWORD
+echo Create user: "${new_user}"using password: "${new_password}"
 # Create the user; add to group; create home directory (-m); set password hashed
-useradd -G users,sudo,ssh-access -m -s /bin/$NEW_SHELL -p $(echo $NEW_PASSWORD | openssl passwd -1 -stdin) $NEW_USER
+useradd -G users,sudo,ssh-access -m -s /bin/"${new_shell}" -p $(echo "${new_password}" | openssl passwd -1 -stdin) "${new_user}"
 
 echo Show information about the user:
-getent passwd $NEW_USER
-id -Gn $NEW_USER
+getent passwd "${new_user}"
+id -Gn "${new_user}"
 
 echo Copy public SSH keys installed by Digital Ocean in root into new users home directory
-cp -R /root/.ssh/ $NEW_USER_HOMEDIR
+cp -R /root/.ssh/ "${new_user_homedir}"
 
-chmod 700 $NEW_USER_HOMEDIR/.ssh
-chmod 600 $NEW_USER_HOMEDIR/.ssh/*
-chown -R $NEW_USER:$NEW_USER $NEW_USER_HOMEDIR/.ssh
+chmod 700 "${new_user_homedir}"/.ssh
+chmod 600 "${new_user_homedir}"/.ssh/*
+chown -R "${new_user}":"${new_user}" "${new_user_homedir}"/.ssh
 
 exit
 

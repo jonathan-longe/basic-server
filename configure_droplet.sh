@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SERVER_IP=$1
+server_ip=$1
 
 # This script configures a remote DigitalOcean server called a 'droplet'
 
@@ -13,8 +13,7 @@ export SERVER_IP=$1
 # Then, from your desktop / laptop run:  ./configure_droplet.sh "server_ip"
 #   - where "server_ip" is the ip address of the newly instantiated DigitalOcean server
 
-if [ -z "$SERVER_IP" ]
-then
+if [[ -z "$server_ip" ]]; then
     echo 'Error:  you must provide the IP address of the remote server'
     exit
 fi
@@ -24,21 +23,21 @@ echo Create remote sudo user: $USER
 
 echo ''
 
-echo What will be the password for $USER on $SERVER_IP
-read NEW_PASSWORD
+echo What will be the password for $USER on "${server_ip}"
+read new_password
 
 echo ''
 
-read -e -p "SSH Port? " -i "22" SSH_PORT
-echo $SSH_PORT
+read -e -p "SSH Port? " -i "22" ssh_port
+echo "${ssh_port}"
 
 echo ''
 
 echo 'What shell do you want to install? Enter the number that corresponds to your choice below'
 options=("bash" "zsh")
-select REMOTE_SHELL in "${options[@]}"
+select remote_shell in "${options[@]}"
 do
-    case $REMOTE_SHELL in
+    case "${remote_shell}" in
         "bash")
             break
             ;;
@@ -51,47 +50,52 @@ done
 echo ''
 
 echo '***************** Delete Known Host Key - if one exists ********************'
-ssh-keygen -f $HOME/.ssh/known_hosts -R "$SERVER_IP"
+ssh-keygen -f $HOME/.ssh/known_hosts -R "${server_ip}"
 
 echo ''
 echo ''
 
-echo Install basic components on $SERVER_IP
-ssh root@$SERVER_IP "bash -s" -- < ./src/basic_setup.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
+echo Install basic components on "${server_ip}"
+ssh root@"${server_ip}" "bash -s" -- < ./src/basic_setup.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo ''
 echo ''
 
-echo Creating $USER on $SERVER_IP using this password: $NEW_PASSWORD
-ssh root@$SERVER_IP "bash -s" -- < ./src/create_new_user.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
+echo Creating $USER on "${server_ip}" using this password: ${new_password}
+ssh root@"${server_ip}" "bash -s" -- < ./src/create_new_user.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo ''
 echo ''
 
 echo Installing Docker and Docker Compose
-ssh root@$SERVER_IP "bash -s" -- < ./src/docker.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
+ssh root@"${server_ip}" "bash -s" -- < ./src/docker.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo ''
 echo ''
 
 
 echo Configure the Uncomplicated Firewall
-ssh root@$SERVER_IP "bash -s" -- < ./src/firewall.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
+# Modify the firewall configuration but don't enable yet as we'll be locked out if the SSH port has changed
+ssh root@"${server_ip}" "bash -s" -- < ./src/firewall.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo ''
 echo ''
 
 echo Make the SSH Daemon more secure
-# After this script runs, root can no longer ssh
-ssh root@$SERVER_IP "bash -s" -- < ./src/ssh_daemon.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
+# Modify the SSH Daemon configuration but don't enable it yet as we'll be locked out if the SSH port has changed
+ssh root@"${server_ip}" "bash -s" -- < ./src/ssh_daemon.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo ''
 echo ''
 
+echo Enable changes to the firewall and SSH Daemon
+# After this command is executed, root can no longer ssh and the new ssh_port (if changed) is active
+ssh root@"${server_ip}" 'service ssh restart; ufw --force enable; ufw status'
 
-if [[ $REMOTE_SHELL == 'zsh' ]]; then
 
-   ssh -p$SSH_PORT $USER@$SERVER_IP "bash -s" -- < ./src/oh-my-zsh-install.sh "$USER" "$NEW_PASSWORD" "$REMOTE_SHELL" "$SSH_PORT"
+if [[ "${remote_shell}" == 'zsh' ]]; then
+
+   ssh -p"${ssh_port}" $USER@"${server_ip}" "bash -s" -- < ./src/oh-my-zsh-install.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 fi
 
