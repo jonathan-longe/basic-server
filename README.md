@@ -13,13 +13,12 @@ The script configures / installs the following on the remote server:
   * updates and upgrades all packages
   * installs: ufw, docker, docker-compose, git, curl, zsh, wget, nodejs, npm
   * if zsh is selected as the shell, installs oh-my-zsh and the bullet-train-theme
-  * replaces sshd_config with version that:
-    * prohibits root logins
-    * allows only you access with your public key
-    * configures the ssh port selected
+  * replaces sshd_config with a version that:
+    * prohibits root logins,
+    * allows public key authentication; and,
+    * other ssh server hardening
   * configures ufw (uncomplicated firewall) to expose only the following ports:
-    * 80, 443, 123 and the port used by the ssh daemon
-
+    * 80, 443, 123
 
 ## Usage
 
@@ -40,11 +39,6 @@ The script configures / installs the following on the remote server:
 4) After the script has finished, ssh from your local machine:
 ```bash
 ssh <IP_ADDRESS_OF_REMOTE_SERVER>
-```
-If you've used a non-standard port for ssh, use a '-p' parameter like this:
-
-```bash
-ssh -p<SSH_PORT> <IP_ADDRESS_OF_REMOTE_SERVER>
 ```
 
 ## Credits
