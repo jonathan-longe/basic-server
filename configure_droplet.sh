@@ -1,12 +1,13 @@
 #!/bin/bash
 
 server_ip=$1
+ssh_port="22"
 
 # This script configures a remote DigitalOcean server called a 'droplet'
 
 # Before invoking this script:
 #   - login to DigitalOcean
-#   - create a droplet; (e.g. Debian, 1GB ($5/mth) Toronto or San Fran)
+#   - create a Debian droplet (it must be Debian because the Docker install is specific to Debian)
 #   - make sure droplet includes your ssh key
 
 
@@ -25,11 +26,6 @@ echo ''
 
 echo What will be the password for $USER on "${server_ip}"
 read new_password
-
-echo ''
-
-read -e -p "SSH Port? " -i "22" ssh_port
-echo "${ssh_port}"
 
 echo ''
 

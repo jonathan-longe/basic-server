@@ -1,58 +1,26 @@
 #!/usr/bin/env bash
 
-DOCKER_FINGERPRINT="9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+echo ''
+echo ''
 
 echo '************* Installing Docker *****************'
 
-apt-get install -y apt-transport-https ca-certificates gnupg2 software-properties-common
+apt-get install ca-certificates curl gnupg lsb-release
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+docker compose version
+
+echo '************* Docker and Docker Compose Installed *******************'
 
 echo ''
 echo ''
-echo '**************** verify the finger print ****************'
-
-FINGERPRINT=`apt-key adv --list-public-keys --with-fingerprint --with-colons | grep $DOCKER_FINGERPRINT`
-
-echo 'FINGERPRINT: ' $FINGERPRINT
-
-if [[ $FINGERPRINT == *$DOCKER_FINGERPRINT* ]]; then
-
-  # get the stable version
-  add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-
-  apt-get update
-  apt-get install -y docker-ce docker-ce-cli containerd.io
-
-  echo '************* Installing Docker Compose *****************'
-
-  curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-  compose
-
-  chmod +x /usr/local/bin/docker-compose
-
-  docker-compose --version
-
-  echo '************* Docker and Docker Compose Installed *******************'
-
-  echo ''
-  echo ''
-
-  echo '************* Installing Nodejs and NPM *******************'
-
-  apt-get install -y nodejs npm
-
-  echo '************* Installed Nodejs and NPM *******************'
-
-else
-
-  echo '**********************************************************'
-  echo '**********************************************************'
-  echo '**********************************************************'
-  echo "**** Docker Repository Fingerprint Doesn't Match *********"
-  echo '**********************************************************'
-  echo '**********************************************************'
-  echo '**********************************************************'
-
-fi
 
 exit

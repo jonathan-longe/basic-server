@@ -10,21 +10,29 @@ if [[ -z "${ssh_port}" ]]; then
 fi
 
 echo Make backup of the ssh daemon config file
-cp /etc/ssh/sshd_config /etc/ssh/sshd_config.BAK
+mv /etc/ssh/sshd_config /etc/ssh/sshd_config.BAK
 
-echo '*************** Secure sshd_config ******************'
+echo '*************** Harden sshd_config ******************'
 
-sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
-sed -i "s/#Port 22/Port $ssh_port/g" /etc/ssh/sshd_config
-sed -i 's/ClientAliveInterval 120/ClientAliveInterval 600/g' /etc/ssh/sshd_config
-
-sed -i '$ a ClientAliveCountMax 3' /etc/ssh/sshd_config
-sed -i '$ a AllowGroups ssh-access' /etc/ssh/sshd_config
+cat << EOF > /etc/ssh/sshd_config
+PermitRootLogin no
+MaxAuthTries 3
+LoginGraceTime 20
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+KerberosAuthentication no
+GSSAPIAuthentication no
+X11Forwarding no
+PermitUserEnvironment no
+AllowAgentForwarding no
+AllowTcpForwarding yes
+PermitTunnel no
+AllowGroups ssh-access
+EOF
 
 diff --color=always /etc/ssh/sshd_config.BAK /etc/ssh/sshd_config
 
-
-# We cannot restart the ssh service:
-# service ssh restart
+# We don't restart the ssh service now otherwise subsequent scripts could not login as root
 
 exit
