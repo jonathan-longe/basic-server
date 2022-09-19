@@ -18,7 +18,7 @@ ufw default allow outgoing
 # open ssh port
 ufw allow "${ssh_port}"/tcp
 
-# open http port
+# open http ports
 ufw allow 80/tcp
 ufw allow 443/tcp
 

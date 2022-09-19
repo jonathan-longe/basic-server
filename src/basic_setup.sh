@@ -10,7 +10,7 @@ echo Update system
 apt-get update && apt-get -y upgrade
 
 echo Installing essentials
-apt-get install -y git curl git-core wget
+apt-get install -y git curl git-core wget rsync
 
 
 exit
