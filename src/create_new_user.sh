@@ -26,7 +26,6 @@ if [[ -z "${new_shell}" ]]; then
 
 fi
 
-
 new_user_homedir=/home/"${new_user}"
 
 addgroup ssh-access
@@ -37,7 +36,7 @@ if [[ "${new_shell}" == 'zsh' ]]; then
 
 fi
 
-echo Create user: "${new_user}"using password: "${new_password}"
+echo Create user: "${new_user}" using password provided
 # Create the user; add to group; create home directory (-m); set password hashed
 useradd -G users,sudo,ssh-access -m -s /bin/"${new_shell}" -p $(echo "${new_password}" | openssl passwd -1 -stdin) "${new_user}"
 

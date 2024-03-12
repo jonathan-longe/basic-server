@@ -29,19 +29,8 @@ read new_password
 
 echo ''
 
-echo 'What shell do you want to install? Enter the number that corresponds to your choice below'
-options=("bash" "zsh")
-select remote_shell in "${options[@]}"
-do
-    case "${remote_shell}" in
-        "bash")
-            break
-            ;;
-        "zsh")
-            break
-            ;;
-    esac
-done
+# ZSH is fantastic; why use anything else?
+remote_shell="zsh"
 
 echo ''
 
@@ -57,18 +46,14 @@ ssh root@"${server_ip}" "bash -s" -- < ./src/basic_setup.sh "$USER" "${new_passw
 echo ''
 echo ''
 
-echo Creating $USER on "${server_ip}" using this password: ${new_password}
+echo Creating $USER on "${server_ip}" using this password provided
 ssh root@"${server_ip}" "bash -s" -- < ./src/create_new_user.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo ''
 echo ''
 
-echo Installing Docker and Docker Compose
-ssh root@"${server_ip}" "bash -s" -- < ./src/docker.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
-
-echo ''
-echo ''
-
+# echo Installing Docker and Docker Compose
+# ssh root@"${server_ip}" "bash -s" -- < ./src/docker.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 echo Configure the Uncomplicated Firewall
 # Modify the firewall configuration but don't enable yet as we'll be locked out if the SSH port has changed
@@ -88,11 +73,6 @@ echo Enable changes to the firewall and SSH Daemon
 # After this command is executed, root can no longer ssh and the new ssh_port (if changed) is active
 ssh root@"${server_ip}" 'service ssh restart; ufw --force enable; ufw status'
 
-
-if [[ "${remote_shell}" == 'zsh' ]]; then
-
-   ssh -p"${ssh_port}" $USER@"${server_ip}" "bash -s" -- < ./src/oh-my-zsh-install.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
-
-fi
+ssh -p"${ssh_port}" $USER@"${server_ip}" "bash -s" -- < ./src/oh-my-zsh-install.sh "$USER" "${new_password}" "${remote_shell}" "${ssh_port}"
 
 
